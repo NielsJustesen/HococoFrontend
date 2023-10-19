@@ -63,11 +63,16 @@ export default createStore({
         })
         .catch((error) => {
           console.log(error);
+          commit("setApiMessage", error.response.data.message);
         });
     },
 
     async clearProperties({ commit }) {
       commit("setProperties", undefined);
+    },
+
+    async clearApiMessage({ commit }) {
+      commit("setApiMessage", "");
     },
   },
   getters: {

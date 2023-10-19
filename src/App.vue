@@ -2,7 +2,6 @@
   <div class="wrapper">
     <div class="containers">
       <h1>taxonomy</h1>
-      <p>{{ apiMessage }}</p>
       <div class="container">
         <MyCard
           v-for="corp in corporations"
@@ -27,6 +26,7 @@
           :zipCode="building.zip_code"
         />
       </div>
+
       <h3 v-if="selectedBuildingName !== ''">
         {{ selectedBuildingName }}s children
       </h3>
@@ -46,14 +46,21 @@
     </div>
 
     <div class="my-form">
-      <h3>Change parent on node</h3>
-      <form action="" @submit.prevent="changeParent">
-        <div style="margin-bottom: 1em">
-          new parent id:
-          <input type="number" v-model="selectedNode.parent_id" />
-        </div>
-        <input type="submit" value="change" />
-      </form>
+      <div
+        v-if="
+          selectedNode.type === 'Property' || selectedNode.type === 'Building'
+        "
+      >
+        <h3>Change parent on node</h3>
+        <form action="" @submit.prevent="changeParent">
+          <div style="margin-bottom: 1em">
+            new parent id:
+            <input type="number" v-model="selectedNode.parent_id" />
+          </div>
+          <input type="submit" value="change" />
+        </form>
+        <p>Message: {{ apiMessage }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -90,6 +97,7 @@ export default {
       store.dispatch("clearProperties");
       selectedBuildingName.value = "";
       store.dispatch("fetchChildNodes", corp);
+      selectedNode.value = corp;
     };
 
     const buildingClicked = (building) => {
@@ -116,6 +124,10 @@ export default {
       store.dispatch("changeParent", selectedNode.value);
     };
 
+    setInterval(() => {
+      store.dispatch("clearApiMessage");
+    }, 2000);
+
     return {
       selectedCorpName,
       selectedBuildingName,
@@ -139,6 +151,8 @@ export default {
   flex-direction: row;
   gap: 1em;
   margin-bottom: 1em;
+  border-bottom: 1px solid black;
+  padding-bottom: 1em;
 }
 .wrapper {
   display: flex;
