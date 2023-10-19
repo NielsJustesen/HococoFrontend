@@ -126,12 +126,13 @@ export default {
         })
         .then(() => {
           store.dispatch("fetchChildNodes", selectedBuilding.value);
+        })
+        .then(() => {
+          setTimeout(() => {
+            store.dispatch("clearApiMessage");
+          }, 2000);
         });
     };
-
-    setInterval(() => {
-      store.dispatch("clearApiMessage");
-    }, 2000);
 
     return {
       selectedCorp,
