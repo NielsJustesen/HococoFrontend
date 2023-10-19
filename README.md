@@ -8,6 +8,10 @@ npm install
 
 ### Compiles and hot-reloads for development
 
+##
+
+check that the endpoint in the store.js matches the api server.
+
 ```
 npm run serve
 ```
