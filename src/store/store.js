@@ -1,0 +1,79 @@
+// store/store.js
+import { createStore } from "vuex";
+import axios from "axios";
+
+const endpoint = "http://hococobackend.test/api/node";
+
+export default createStore({
+  state: {
+    corporations: {},
+    buildings: {},
+    properties: {},
+    apiMessage: "",
+  },
+
+  mutations: {
+    setCorporations(state, data) {
+      state.corporations = data;
+    },
+    setBuildings(state, data) {
+      state.buildings = data;
+    },
+    setProperties(state, data) {
+      state.properties = data;
+    },
+    setTest(state, data) {
+      state.test = data;
+    },
+    setApiMessage(state, data) {
+      state.apiMessage = data;
+    },
+  },
+  actions: {
+    async fetchCorporations({ commit }) {
+      return await axios.get(endpoint).then((response) => {
+        commit("setCorporations", response.data);
+      });
+    },
+
+    async fetchChildNodes({ commit }, parentNode) {
+      if (parentNode.type === "Property") return;
+      if (parentNode.type === "Corporation") {
+        return await axios
+          .get(endpoint + `/${parentNode.type}/${parentNode.id}`)
+          .then((response) => {
+            commit("setBuildings", response.data);
+          });
+      }
+      if (parentNode.type === "Building") {
+        return await axios
+          .get(endpoint + `/${parentNode.type}/${parentNode.id}`)
+          .then((response) => {
+            commit("setProperties", response.data);
+          });
+      }
+    },
+
+    async changeParent({ commit }, node) {
+      return await axios
+        .put(endpoint + `/changeParent/${node.id}`, node)
+        .then((response) => {
+          console.log(response);
+          commit("setApiMessage", response.data.message);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    async clearProperties({ commit }) {
+      commit("setProperties", undefined);
+    },
+  },
+  getters: {
+    getCorporations: (state) => state.corporations,
+    getBuildings: (state) => state.buildings,
+    getProperties: (state) => state.properties,
+    getApiMessage: (state) => state.apiMessage,
+  },
+});
