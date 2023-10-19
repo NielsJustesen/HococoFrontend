@@ -2,6 +2,7 @@
   <div class="wrapper">
     <div class="containers">
       <h1>taxonomy</h1>
+      <p>Corporations</p>
       <div class="container">
         <MyCard
           v-for="corp in corporations"
@@ -14,6 +15,7 @@
         />
       </div>
       <h2 v-if="selectedCorpName !== ''">{{ selectedCorpName }}s children</h2>
+      <p>Buildings</p>
       <div class="container">
         <MyCard
           v-for="building in buildings"
@@ -31,6 +33,7 @@
         {{ selectedBuildingName }}s children
       </h3>
 
+      <p>Properties</p>
       <div class="container">
         <MyCard
           v-for="property in properties"
