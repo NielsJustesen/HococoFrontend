@@ -31,9 +31,15 @@ export default createStore({
   },
   actions: {
     async fetchCorporations({ commit }) {
-      return await axios.get(endpoint).then((response) => {
-        commit("setCorporations", response.data);
-      });
+      return await axios
+        .get(endpoint)
+        .then((response) => {
+          commit("setCorporations", response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+          commit("setApiMessage", error.response.data.message);
+        });
     },
 
     async fetchChildNodes({ commit }, parentNode) {
@@ -43,6 +49,10 @@ export default createStore({
           .get(endpoint + `/${parentNode.type}/${parentNode.id}`)
           .then((response) => {
             commit("setBuildings", response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+            commit("setApiMessage", error.response.data.message);
           });
       }
       if (parentNode.type === "Building") {
@@ -50,6 +60,10 @@ export default createStore({
           .get(endpoint + `/${parentNode.type}/${parentNode.id}`)
           .then((response) => {
             commit("setProperties", response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+            commit("setApiMessage", error.response.data.message);
           });
       }
     },
@@ -58,7 +72,6 @@ export default createStore({
       return await axios
         .put(endpoint + `/changeParent/${node.id}`, node)
         .then((response) => {
-          console.log(response);
           commit("setApiMessage", response.data.message);
         })
         .catch((error) => {

@@ -14,7 +14,7 @@
           :type="corp.type"
         />
       </div>
-      <h2 v-if="selectedCorpName !== ''">{{ selectedCorpName }}s children</h2>
+      <h2 v-if="selectedCorp">{{ selectedCorp.name }}s children</h2>
       <p>Buildings</p>
       <div class="container">
         <MyCard
@@ -29,9 +29,7 @@
         />
       </div>
 
-      <h3 v-if="selectedBuildingName !== ''">
-        {{ selectedBuildingName }}s children
-      </h3>
+      <h3 v-if="selectedBuilding">{{ selectedBuilding.name }}s children</h3>
 
       <p>Properties</p>
       <div class="container">
@@ -80,38 +78,35 @@ export default {
   setup() {
     const store = useStore();
 
+    store.dispatch("fetchCorporations");
+
     const apiMessage = computed(() => {
       return store.getters.getApiMessage;
     });
 
-    const selectedCorpName = ref("");
-    const selectedBuildingName = ref("");
-
+    const selectedCorp = ref(undefined);
+    const selectedBuilding = ref(undefined);
     const selectedNode = ref({});
-
-    store.dispatch("fetchCorporations");
 
     const corporations = computed(() => {
       return store.getters.getCorporations;
     });
 
     const corpClicked = (corp) => {
-      selectedCorpName.value = corp.name;
-      store.dispatch("clearProperties");
-      selectedBuildingName.value = "";
-      store.dispatch("fetchChildNodes", corp);
+      selectedCorp.value = corp;
+      selectedBuilding.value = undefined;
       selectedNode.value = corp;
+      store.dispatch("clearProperties");
+      store.dispatch("fetchChildNodes", corp);
     };
 
     const buildingClicked = (building) => {
-      selectedBuildingName.value = building.name;
-      store.dispatch("fetchChildNodes", building);
-      console.log(building);
+      selectedBuilding.value = building;
       selectedNode.value = building;
+      store.dispatch("fetchChildNodes", building);
     };
 
     const propertyClicked = (property) => {
-      console.log(property);
       selectedNode.value = property;
     };
 
@@ -124,7 +119,14 @@ export default {
     });
 
     const changeParent = () => {
-      store.dispatch("changeParent", selectedNode.value);
+      store
+        .dispatch("changeParent", selectedNode.value)
+        .then(() => {
+          store.dispatch("fetchChildNodes", selectedCorp.value);
+        })
+        .then(() => {
+          store.dispatch("fetchChildNodes", selectedBuilding.value);
+        });
     };
 
     setInterval(() => {
@@ -132,8 +134,8 @@ export default {
     }, 2000);
 
     return {
-      selectedCorpName,
-      selectedBuildingName,
+      selectedCorp,
+      selectedBuilding,
       corporations,
       buildings,
       properties,
