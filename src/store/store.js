@@ -2,7 +2,7 @@
 import { createStore } from "vuex";
 import axios from "axios";
 
-const endpoint = "http://hococobackend.test/api/node";
+const endpoint = "http://127.0.0.1:8000/api/node";
 
 export default createStore({
   state: {
