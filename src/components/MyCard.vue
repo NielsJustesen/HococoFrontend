@@ -3,7 +3,6 @@
     <p v-if="id">ID: {{ id }}</p>
     <p>Name: {{ name }}</p>
     <p>Type: {{ type }}</p>
-    <p>Height: {{ height }}</p>
     <p v-if="zipCode">Zip code: {{ zipCode }}</p>
     <p v-if="monthlyRent">Rent: {{ monthlyRent }}</p>
   </div>

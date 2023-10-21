@@ -12,6 +12,7 @@
           :height="corp.height"
           :name="corp.name"
           :type="corp.type"
+          :class="selectedCorp.id == corp.id ? 'highlight' : ''"
         />
       </div>
       <h2 v-if="selectedCorp">{{ selectedCorp.name }}s children</h2>
@@ -26,6 +27,7 @@
           :name="building.name"
           :type="building.type"
           :zipCode="building.zip_code"
+          :class="selectedBuilding.id == building.id ? 'highlight' : ''"
         />
       </div>
 
@@ -42,6 +44,7 @@
           :name="property.name"
           :type="property.type"
           :monthlyRent="property.monthly_rent"
+          :class="selectedProperty.id == property.id ? 'highlight' : ''"
         />
       </div>
     </div>
@@ -52,15 +55,23 @@
           selectedNode.type === 'Property' || selectedNode.type === 'Building'
         "
       >
-        <h3>Change parent on node</h3>
+        <h3>Change parent on {{ selectedNode.name }}</h3>
         <form action="" @submit.prevent="changeParent">
           <div style="margin-bottom: 1em">
-            new parent id:
-            <input type="number" v-model="selectedNode.parent_id" />
+            New parent id:
+            <select name="" id="" v-model="selectedNode.parent_id">
+              <option
+                v-for="parent in availableParents"
+                :key="parent.id"
+                :value="parent.id"
+              >
+                {{ parent.id }}, {{ parent.name }}
+              </option>
+            </select>
           </div>
           <input type="submit" value="change" />
         </form>
-        <p>Message: {{ apiMessage }}</p>
+        <p v-if="apiMessage">Message: {{ apiMessage }}</p>
       </div>
     </div>
   </div>
@@ -84,8 +95,14 @@ export default {
       return store.getters.getApiMessage;
     });
 
-    const selectedCorp = ref(undefined);
-    const selectedBuilding = ref(undefined);
+    const availableParents = computed(() => {
+      return store.getters.getAvailableParents;
+    });
+
+    const selectedCorp = ref({});
+    const selectedBuilding = ref({});
+    const selectedProperty = ref({});
+
     const selectedNode = ref({});
 
     const corporations = computed(() => {
@@ -94,7 +111,8 @@ export default {
 
     const corpClicked = (corp) => {
       selectedCorp.value = corp;
-      selectedBuilding.value = undefined;
+      selectedBuilding.value = {};
+      selectedProperty.value = {};
       selectedNode.value = corp;
       store.dispatch("clearProperties");
       store.dispatch("fetchChildNodes", corp);
@@ -103,11 +121,14 @@ export default {
     const buildingClicked = (building) => {
       selectedBuilding.value = building;
       selectedNode.value = building;
+      store.dispatch("fetchAvailableParents", building);
       store.dispatch("fetchChildNodes", building);
     };
 
     const propertyClicked = (property) => {
       selectedNode.value = property;
+      selectedProperty.value = property;
+      store.dispatch("fetchAvailableParents", property);
     };
 
     const buildings = computed(() => {
@@ -137,6 +158,7 @@ export default {
     return {
       selectedCorp,
       selectedBuilding,
+      selectedProperty,
       corporations,
       buildings,
       properties,
@@ -144,6 +166,7 @@ export default {
       buildingClicked,
       propertyClicked,
       selectedNode,
+      availableParents,
       changeParent,
       apiMessage,
     };
@@ -168,5 +191,9 @@ export default {
   margin-left: 2em;
   padding-top: 4em;
   padding-left: 2em;
+}
+
+.highlight {
+  box-shadow: 3px 3px 3px black;
 }
 </style>

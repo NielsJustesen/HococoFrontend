@@ -9,6 +9,7 @@ export default createStore({
     corporations: {},
     buildings: {},
     properties: {},
+    availableParents: {},
     apiMessage: "",
   },
 
@@ -22,8 +23,8 @@ export default createStore({
     setProperties(state, data) {
       state.properties = data;
     },
-    setTest(state, data) {
-      state.test = data;
+    setAvailableParents(state, data) {
+      state.availableParents = data;
     },
     setApiMessage(state, data) {
       state.apiMessage = data;
@@ -38,7 +39,6 @@ export default createStore({
         })
         .catch((error) => {
           console.log(error);
-          commit("setApiMessage", error.response.data.message);
         });
     },
 
@@ -68,6 +68,18 @@ export default createStore({
       }
     },
 
+    async fetchAvailableParents({ commit }, node) {
+      return await axios
+        .get(endpoint + `/availableParents/${node.type}/${node.id}`)
+        .then((response) => {
+          console.log(response);
+          commit("setAvailableParents", response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
     async changeParent({ commit }, node) {
       return await axios
         .put(endpoint + `/changeParent/${node.id}`, node)
@@ -92,6 +104,7 @@ export default createStore({
     getCorporations: (state) => state.corporations,
     getBuildings: (state) => state.buildings,
     getProperties: (state) => state.properties,
+    getAvailableParents: (state) => state.availableParents,
     getApiMessage: (state) => state.apiMessage,
   },
 });
