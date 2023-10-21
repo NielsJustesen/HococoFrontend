@@ -58,7 +58,7 @@
         <h3>Change parent on {{ selectedNode.name }}</h3>
         <form action="" @submit.prevent="changeParent">
           <div style="margin-bottom: 1em">
-            New parent id:
+            To:
             <select name="" id="" v-model="selectedNode.parent_id">
               <option
                 v-for="parent in availableParents"
